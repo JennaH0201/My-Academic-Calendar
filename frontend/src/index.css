@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import '@fullcalendar/core/index.css';
+@import '@fullcalendar/daygrid/index.css';
+@import '@fullcalendar/list/index.css';
+
+/*Calendar_css */
+
+/*header*/
+.fc .fc-col-header {
+    background-color: #f3f4f6; 
+  }
+
+  .fc .fc-col-header-cell-cushion {
+    display: block;
+    padding: 8px 0;
+    font-weight: 600;
+  }
+  
+
+  .fc .fc-day-sat .fc-col-header-cell-cushion { color: #3b82f6; } /* 파랑 */
+  .fc .fc-day-sun .fc-col-header-cell-cushion { color: #ef4444; } /* 빨강 */
+  
+
+  .fc .fc-daygrid-day.fc-day-sat .fc-daygrid-day-number { color: #3b82f6; }
+  .fc .fc-daygrid-day.fc-day-sun .fc-daygrid-day-number { color: #ef4444; }
+  
+
+  .fc-theme-standard .fc-scrollgrid,
+  .fc-theme-standard td, 
+  .fc-theme-standard th {
+    border-color: #e5e7eb; /* gray-200 */
+  }
