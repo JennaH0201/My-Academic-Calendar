@@ -4,8 +4,8 @@ import axiosInstance from '../axiosConfig';
   
   function CalendarwithEvents() {
     const events = [
-      { title: 'Meeting', date: '2024-08-15' },
-      { title: 'Conference', date: '2024-08-20' },
+      { title: 'dueDate', date: '2024-08-15' },
+      { title: 'finalExam', date: '2024-010-27' },
     ];
 
     return (
