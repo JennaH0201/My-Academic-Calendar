@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import axiosInstance from '../axiosConfig';
 
@@ -6,89 +6,76 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
+export default function Calendar() {
+  const { user } = useAuth();
+  const token = user?.token || null;
 
-const Calendar = (date) => {
-    const currentYear = new Date(date).getFullYear();
-    const currentMonth = new Date(date).getMonth() + 1;
-  
-    const firstDay = new Date(date.setDate(1)).getDay();
-    const lastDay = new Date(currentYear, currentMonth, 0).getDate();
-  
-    const limitDay = firstDay + lastDay;
-    const nextDay = Math.ceil(limitDay / 7) * 7;
-  
-    let htmlDummy = '';
-  
-    for (let i = 0; i < firstDay; i++) {
-      htmlDummy += `<div class="noColor"></div>`;
-    }
-  
-    for (let i = 1; i <= lastDay; i++) {    
-      htmlDummy += `<div>${i}</div>`;
-    }
-  
-    for (let i = limitDay; i < nextDay; i++) {
-      htmlDummy += `<div class="noColor"></div>`;
-    }
-  
-    document.querySelector(`.dateBoard`).innerHTML = htmlDummy;
-    document.querySelector(`.dateTitle`).innerText = `${currentYear} ${currentMonth}`;
-  }
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-const data = [
-    { date: '2022-10-15', content: '테스트1' },
-    { date: '2022-10-03', content: '테스트2' },
-    { date: '2022-10-15', content: '테스트3' },
-    { date: '2022-10-26', content: '테스트4' },
-    { date: '2022-10-21', content: '테스트5' },
-  ];
 
-const calendarList = data.reduce(
-    (acc, v) => 
-      ({ ...acc, [v.date]: [...(acc[v.date] || []), v.content] })
-    , {}
+  const fetchData = useCallback(
+    async (startStr, endStr) => {
+      setLoading(true);
+      try {
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+        
+        const [evRes, dlRes] = await Promise.all([
+          axiosInstance.get('/api/calendar/events', {
+            params: { semester: '2025S2', from: startStr, to: endStr },
+            headers,
+          }),
+          axiosInstance.get('/api/assignments/deadlines', {
+            params: { dueAfter: startStr, dueBefore: endStr, status: 'pending' },
+            headers,
+          }),
+        ]);
+
+        const acad = (evRes.data?.items || []).map((e) => ({
+          id: `acad-${e._id}`,
+          title: e.title,
+          start: e.startDate,
+          end: e.endDate || e.startDate,
+          allDay: true,
+          backgroundColor: '#3b82f6',
+          borderColor: '#3b82f6',
+        }));
+
+        const dls = (dlRes.data?.items || []).map((a) => ({
+          id: `dl-${a._id}`,
+          title: `[Due] ${a.courseId} ${a.title}`,
+          start: a.dueDate,
+          allDay: true,
+          backgroundColor: '#ef4444',
+          borderColor: '#ef4444',
+        }));
+
+        setEvents([...acad, ...dls]);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [token]
   );
-  
-  Number.prototype.pad = function() {
-    return this > 9 ? this : '0' + this;
-  }
 
-    const currentYear = new Date(date).getFullYear();
-    const currentMonth = new Date(date).getMonth() + 1;
-  
-    const firstDay = new Date(date.setDate(1)).getDay();
-    const lastDay = new Date(currentYear, currentMonth, 0).getDate();
-  
-    const limitDay = firstDay + lastDay;
-    const nextDay = Math.ceil(limitDay / 7) * 7;
-  
-    let htmlDummy = '';
-  
-    for (let i = 0; i < firstDay; i++) {
-      htmlDummy += `<div class="noColor"></div>`;
-    }
-  
-    for (let i = 1; i <= lastDay; i++) {
-      const date = `${currentYear}-${currentMonth.pad()}-${i.pad()}`
-      
-      htmlDummy += `
-        <div>
-          ${i}
-          <p>
-            ${calendarList[date]?.join('</p><p>') || ''}
-          </p>
-        </div>
-      `;
-    }
-  
-    for (let i = limitDay; i < nextDay; i++) {
-      htmlDummy += `<div class="noColor"></div>`;
-    }
-    
-    document.querySelector(`.dateBoard`).innerHTML = htmlDummy;
-    document.querySelector(`.dateTitle`).innerText = `${currentYear} ${currentMonth}`;
-  
+  return (
+    <div className="p-4">
+      {loading && <div className="text-sm mb-2">Loading…</div>}
 
-const date = new Date();
-  
-  Calendar(date);
+      <FullCalendar
+        plugins={[dayGridPlugin, interactionPlugin]}
+        initialView="dayGridMonth"
+        firstDay={1}                   
+        height="auto"
+        events={events}
+        headerToolbar={{ left: 'prev,next today', center: 'title', right: '' }}
+
+        datesSet={({ startStr, endStr }) => fetchData(startStr, endStr)}
+       
+      />
+    </div>
+  );
+}
