@@ -2,12 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import '@fullcalendar/core/index.css';
-@import '@fullcalendar/daygrid/index.css';
-@import '@fullcalendar/list/index.css';
-
-/*Calendar_css */
-
 /*header*/
 .fc .fc-col-header {
     background-color: #f3f4f6; 
