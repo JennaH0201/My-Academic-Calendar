@@ -3,12 +3,13 @@
 
 My Academic Calendar App is an application designed to efficiently manage important and lots of schedules. After logging in, the user is directed to a dashboard page where a calendar is displayed. The users can enter assignment due dates and exam schedules. The app also provides an alarm function that can be configured to send notifications either via email or in app. These alarms can be customized with flexible timing options, such as 30 minutes before or one day before the scheduled event
 
+
 **Features**
 - User authenticatoin
 - Dashboard with calendar
 - Create, edit, and delete events
 - Notification system via email and app
-- Customizable notification settings.
+- Customizable notification setting
 
 **Install**
 -npm install
