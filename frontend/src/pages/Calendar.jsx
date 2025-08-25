@@ -36,9 +36,9 @@ const Calendar = (date) => {
   }
 
 const data = [
-    { date: '2025-08-15', content: '테스트1' },
-    { date: '2025-08-31', content: '테스트2' },
-    { date: '2025-10-01', content: '테스트3' },
+    { date: '2025-08-15', content: 'test1' },
+    { date: '2025-08-31', content: 'test2' },
+    { date: '2025-10-01', content: 'test3' },
   ];
 
 const calendarList = data.reduce(
